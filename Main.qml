@@ -1,6 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
-
+import QtQuick.Controls 2.15
 
 Window {
     id: root
@@ -11,32 +11,81 @@ Window {
     flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool
     color: "#00000000"
 
-    // Key handler container
-    Item {
-        anchors.fill: parent
-        focus: true
+    property string resultText: ""
 
-        Keys.onEscapePressed: Qt.quit() // or root.close()
-
+    // Fullscreen overlay at top
+    OverlayWindow {
+        id: overlayWindow
     }
 
-
-
-        // Reserve space for control panel
-        Overlay {
-            id: overlayWindow
+    // Scrollable section with control panel and results in a rectangle
+    Flickable {
+        id: scrollArea
+        anchors {
+            top: overlayWindow.bottom
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+            margins: 20
         }
-        // Launch overlay on top
-        Component.onCompleted: overlayWindow.show()
 
-        // Control panel docked at the bottom
-        ControlPanel {
-            anchors {
-                left: parent.left
-                right: parent.right
-                bottom: parent.bottom
-                margins: 20
+        contentWidth: parent.width
+        contentHeight: backgroundContainer.height
+        clip: true
+        boundsBehavior: Flickable.StopAtBounds
+
+        ScrollBar.vertical: ScrollBar {
+            policy: ScrollBar.AsNeeded
+            active: true
+
+            background: Rectangle {
+                color: "#111111"
+                radius: 5
             }
-            height: 180
+
+            contentItem: Rectangle {
+                implicitWidth: 15
+                radius: 3
+                color: "#888888"
+            }
         }
+
+        Rectangle {
+            id: backgroundContainer
+            width: parent.width
+            height: contentColumn.implicitHeight +10
+            color: "#222222"
+            radius: 12
+            border.color: "#444444"
+            border.width: 1
+            anchors.horizontalCenter: parent.horizontalCenter
+
+
+            Column {
+                id: contentColumn
+                width: parent.width
+                spacing: 20
+                padding: 20
+                anchors.margins: 20
+
+                ControlPanel {
+                    id: controlPanel
+                    width: parent.width - 200
+                    height: 80
+                }
+
+                ResultSection {
+                    id: resultSection
+                    width: parent.width - 200
+                    visible: resultText.length > 0
+                    resultText: root.resultText
+                }
+            }
+        }
+    }
+
+    // Populate sample data to test scrolling
+    Component.onCompleted: {
+        root.resultText = Array(50).fill("Line of result text").join("\n")
+    }
 }
