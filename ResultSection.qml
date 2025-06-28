@@ -18,16 +18,26 @@ Rectangle {
 
     implicitHeight: resultTextItem.implicitHeight + 32
 
-    Text {
-        padding: 30
+    TextEdit {
         id: resultTextItem
         text: resultText
         color: "white"
-        wrapMode: Text.WordWrap
+        wrapMode: TextEdit.WordWrap
         width: parent.width - 32
-        anchors.horizontalCenter: parent.horizontalCenter
+        readOnly: true
+        selectByMouse: true
         font.pixelSize: 16
+        anchors.horizontalCenter: parent.horizontalCenter
+        padding: 30
+
     }
+
+    Keys.onPressed: {
+        if (event.key === Qt.Key_Escape) {
+            Qt.quit();
+        }
+    }
+
 
     Connections {
            target: groq
