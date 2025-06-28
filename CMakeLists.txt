@@ -16,8 +16,12 @@ qt_add_qml_module(appAIOnScreenAssistant
     URI AIOnScreenAssistant
     VERSION 1.0
     QML_FILES Main.qml
-        QML_FILES Overlay.qml
+    QML_FILES OverlayWindow.qml
         QML_FILES ControlPanel.qml
+        QML_FILES ResultSection.qml
+        SOURCES GroqAPI.h
+        SOURCES GroqAPI.cpp
+        SOURCES GroqAPI.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
