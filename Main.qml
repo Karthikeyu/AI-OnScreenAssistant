@@ -14,6 +14,7 @@ Window {
     flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     color: "#00000000"
 
+
     property string resultText: ""
 
 
@@ -30,7 +31,7 @@ Window {
             left: parent.left
             right: parent.right
             bottom: parent.bottom
-            margins: 0
+            margins: 5
         }
 
         property int controlPanelHeight: 80
@@ -90,7 +91,7 @@ Window {
     }
 
     Component.onCompleted: {
-        root.resultText = "Please ask any question to fetch the answer."
+        root.resultText = "Please ask any question to fetch the answer. Press ESC to quit."
     }
 }
 

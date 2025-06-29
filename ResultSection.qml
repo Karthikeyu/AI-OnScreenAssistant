@@ -27,6 +27,7 @@ Rectangle {
         readOnly: true
         selectByMouse: true
         font.pixelSize: 16
+        textFormat: TextEdit.RichText
         anchors.horizontalCenter: parent.horizontalCenter
         padding: 30
 
@@ -41,6 +42,45 @@ Rectangle {
 
     Connections {
            target: groq
-           onResponseReceived: resultTextItem.text = response
+           onResponseReceived: resultTextItem.text = markdownToHtml(response)
        }
+
+    function markdownToHtml(text) {
+        let lines = text.split("\n");
+        let html = "";
+        let inList = false;
+
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            if (line.match(/^\s*[\*\-]\s+/)) {
+                if (!inList) {
+                    html += "<ul style='margin-top: 0px; margin-bottom: 0px; padding-left: 16px;'>";
+                    inList = true;
+                }
+                html += "<li style='margin-bottom: 4px;'>" + line.replace(/^\s*[\*\-]\s+/, "") + "</li>";
+            } else {
+                if (inList) {
+                    html += "</ul>";
+                    inList = false;
+                }
+
+                // avoid extra <br/> if next line is a list
+                const nextLineIsList = (i + 1 < lines.length) && lines[i + 1].match(/^\s*[\*\-]\s+/);
+                html += line
+                    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+                    .replace(/\*(.*?)\*/g, "<i>$1</i>");
+                if (!nextLineIsList) {
+                    html += "<br/>";
+                }
+            }
+        }
+
+        if (inList) html += "</ul>";
+
+        return html;
+    }
+
+
+
+
 }

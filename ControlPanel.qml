@@ -8,7 +8,7 @@ Rectangle {
     height: 60
     radius: 20
     //color: "#212121"
-    color: "black"
+    color: "transparent"
     anchors.horizontalCenter: parent.horizontalCenter
     //signal userSubmitted(string inputText)
     RowLayout {
@@ -35,8 +35,8 @@ Rectangle {
             background: Rectangle {
                 radius: 20
                 color: "#303030"
-               // border.color: "#888"       // ✅ border color
-                    //    border.width: 1            // ✅ border thickness
+               border.color: "#888"       // ✅ border color
+                       border.width: 2            // ✅ border thickness
             }
 
 
@@ -67,16 +67,16 @@ Rectangle {
         // }
 
         // Music note button
-        RoundButton {
-           // iconChar: "\u266B" // ♫
-            onClicked: console.log("Music")
-        }
+        // RoundButton {
+        //    // iconChar: "\u266B" // ♫
+        //     onClicked: console.log("Music")
+        // }
 
-        // Translate button
-        RoundButton {
-           // iconChar: "\uD83C\uDF0D" // 🌍
-            onClicked: console.log("Translate")
-        }
+        // // Translate button
+        // RoundButton {
+        //    // iconChar: "\uD83C\uDF0D" // 🌍
+        //     onClicked: console.log("Translate")
+        // }
     }
 
 
