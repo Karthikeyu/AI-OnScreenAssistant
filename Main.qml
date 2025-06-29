@@ -8,15 +8,22 @@ Window {
     visible: true
     width: Screen.width
     //height: screenHeight  // Only occupy the bottom strip
-    height: bottomPanel.screenHeight   // only take required height
+    height: controlPanel.height + Math.min(resultSection.implicitHeight, bottomPanel.maxResultHeight) + 80
+   // only take required height
         y: Screen.height - height          // align window to bottom of screen
     title: "AI Assistant Base"
     flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     color: "#00000000"
 
 
-    property string resultText: ""
 
+    property string resultText: ""
+    Behavior on height {
+        NumberAnimation {
+            duration: 50
+
+        }
+    }
 
 
     Rectangle {
@@ -24,38 +31,37 @@ Window {
         width: parent.width
         height: screenHeight
         color: "#222222"
-        radius: 12
+        radius: 16
         border.color: "#444444"
         border.width: 1
         anchors {
             left: parent.left
             right: parent.right
             bottom: parent.bottom
-            margins: 5
+            margins: 10
         }
 
-        property int controlPanelHeight: 80
+        property int controlPanelHeight: controlPanel.height
         property int maxResultHeight: 200
 
         property int actualResultHeight: Math.min(resultSection.implicitHeight, maxResultHeight)
-        property int screenHeight: controlPanelHeight + actualResultHeight + 40
+        property int screenHeight: controlPanelHeight + resultFlick.height + 80
 
 
         Column {
             id: contentColumn
             width: parent.width
-            spacing: 10
-            padding: 20
+            spacing: 15
+            padding: 30
 
             ControlPanel {
                 id: controlPanel
-                width: parent.width - 40
-                height: bottomPanel.controlPanelHeight
             }
 
             Flickable {
                 id: resultFlick
                 width: parent.width - 40
+                anchors.horizontalCenter: parent.horizontalCenter
                 //height: bottomPanel.maxResultHeight
                 height: Math.min(resultSection.implicitHeight, bottomPanel.maxResultHeight)
                 clip: true

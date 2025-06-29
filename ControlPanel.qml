@@ -5,78 +5,82 @@ import QtQuick.Layouts 1.15
 Rectangle {
     id: controlPanel
     width: parent.width -40
-    height: 60
-    radius: 20
-    //color: "#212121"
-    color: "transparent"
+    color: "#303030"
+        border.color: "#888"
+        border.width: 2
+        radius:16
+  height: inputField.implicitHeight + 20
     anchors.horizontalCenter: parent.horizontalCenter
     //signal userSubmitted(string inputText)
     RowLayout {
         anchors.fill: parent
-        anchors.margins: 10
-        spacing: 10
+        anchors.margins: 0
+        spacing:0
 
 
 
 
-        TextField {
+        TextEdit {
             id: inputField
-            Layout.fillWidth: true
-            Layout.preferredHeight: 40
-            placeholderText: "Type here..."
-            placeholderTextColor: "#AAAAAA"
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignHCenter
-            font.pixelSize: 16
+            text: ""
+            wrapMode: TextEdit.Wrap
+            readOnly: false
+            selectByMouse: true
+            focus: true
             color: "white"
-            focus:true
-            padding: 30
-
-            background: Rectangle {
-                radius: 20
-                color: "#303030"
-               border.color: "#888"       // ✅ border color
-                       border.width: 2            // ✅ border thickness
-            }
-
-
+           // placeholderText: "Type here..."  // works in newer Qt or can be custom
+            font.pixelSize: 16
+            height: 20  // or dynamically grow
+            padding: 5
+            leftPadding: 12
+            width: parent.width
 
             Keys.onPressed: {
-                    if (event.key === Qt.Key_Escape) {
-                        Qt.quit(); // or root.close() if using window id
+                if (event.key === Qt.Key_Escape) {
+                    Qt.quit()
+                    event.accepted = true
+                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                    if (event.modifiers & Qt.ShiftModifier) {
+                        inputField.insert("\n");  // ✅ insert newline
+                    } else {
+                        console.log("User entered:", inputField.text)
+                        groq.sendRequest(inputField.text)
+                        inputField.clear()
                         event.accepted = true
-                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                                console.log("User entered:", inputField.text)
-                               // userSubmitted(inputField.text)  // Signal (if you have it)
-                                groq.sendRequest(inputField.text)
-                                inputField.clear()
-                                event.accepted = true
-                            }
-
+                    }
                 }
+            }
+        }
+        MouseArea {
+            anchors.fill: parent
+            z: 1
+            onPressed: inputField.forceActiveFocus()
+            hoverEnabled: true
+            cursorShape: Qt.IBeamCursor
+        }
+
+        Text {
+            id: placeholder
+            text: "Type here..."
+            color: "#AAAAAA"
+            anchors.verticalCenter: inputField.verticalCenter
+            anchors.left: inputField.left
+            anchors.leftMargin: inputField.leftPadding || 12  // match inputField padding
+            visible: inputField.text.length === 0
+            font.pixelSize: inputField.font.pixelSize
+            z: 2
+        }
+
+        property int lineCount: Math.ceil(inputField.implicitHeight / inputField.font.pixelSize)
+
+        onLineCountChanged: {
+            controlPanel.height = inputField.implicitHeight + 20;
         }
 
 
 
 
 
-        // // Mic button
-        // RoundButton {
-        //     iconChar: "\uD83C\uDFA4" // 🎤
-        //     onClicked: console.log("Mic")
-        // }
-
-        // Music note button
-        // RoundButton {
-        //    // iconChar: "\u266B" // ♫
-        //     onClicked: console.log("Music")
-        // }
-
-        // // Translate button
-        // RoundButton {
-        //    // iconChar: "\uD83C\uDF0D" // 🌍
-        //     onClicked: console.log("Translate")
-        // }
     }
 
 

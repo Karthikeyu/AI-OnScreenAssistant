@@ -23,13 +23,13 @@ Rectangle {
         text: resultText
         color: "white"
         wrapMode: TextEdit.WordWrap
-        width: parent.width - 32
+        width: parent.width
         readOnly: true
         selectByMouse: true
         font.pixelSize: 16
         textFormat: TextEdit.RichText
         anchors.horizontalCenter: parent.horizontalCenter
-        padding: 30
+        padding: 20
 
     }
 
@@ -64,11 +64,10 @@ Rectangle {
                     inList = false;
                 }
 
-                // avoid extra <br/> if next line is a list
                 const nextLineIsList = (i + 1 < lines.length) && lines[i + 1].match(/^\s*[\*\-]\s+/);
                 html += line
-                    .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
-                    .replace(/\*(.*?)\*/g, "<i>$1</i>");
+                    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+                    .replace(/(^|[^\*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>");
                 if (!nextLineIsList) {
                     html += "<br/>";
                 }
@@ -79,6 +78,7 @@ Rectangle {
 
         return html;
     }
+
 
 
 

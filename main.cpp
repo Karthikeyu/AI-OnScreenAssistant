@@ -12,6 +12,8 @@
 #include"GroqAPI.h"
 
 
+
+
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
@@ -39,7 +41,6 @@ int main(int argc, char *argv[])
 
     QObject *mainRoot = !rootList.isEmpty() ? rootList.first(): nullptr;
    // qDebug() << "mainRoot is null?" << (mainRoot == nullptr);
-
 // qDebug() << "helllo";
     if (mainRoot) {
         QQuickWindow *mainWindow = qobject_cast<QQuickWindow *>(mainRoot);
@@ -56,6 +57,7 @@ int main(int argc, char *argv[])
             });
         }
     }
+
 
 
 
