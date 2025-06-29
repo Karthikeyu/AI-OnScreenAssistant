@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 
+
 Window {
     id: root
     objectName: "mainAppWindow"
@@ -10,20 +11,32 @@ Window {
     //height: screenHeight  // Only occupy the bottom strip
     height: controlPanel.height + Math.min(resultSection.implicitHeight, bottomPanel.maxResultHeight) + 80
    // only take required height
-        y: Screen.height - height          // align window to bottom of screen
+    y: Screen.height - height- 20         // align window to bottom of screen
     title: "AI Assistant Base"
     flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     color: "#00000000"
-
-
+    property bool isLoading: false
+    onResultTextChanged: {
+            Qt.callLater(() => {
+                resultSection.visible = resultText.length > 0
+            })
+        }
 
     property string resultText: ""
     Behavior on height {
         NumberAnimation {
-            duration: 50
+            duration: 40
 
         }
     }
+    Behavior on y {
+        NumberAnimation {
+            duration: 80
+            easing.type: Easing.OutCubic
+        }
+    }
+
+
 
 
     Rectangle {
@@ -32,14 +45,18 @@ Window {
         height: screenHeight
         color: "#222222"
         radius: 16
-        border.color: "#444444"
-        border.width: 1
+
+        border.width: 2
         anchors {
             left: parent.left
             right: parent.right
             bottom: parent.bottom
-            margins: 10
+            leftMargin: 10
+            rightMargin : 10
+            topMargin: 10
         }
+
+           border.color: "#00ffff"
 
         property int controlPanelHeight: controlPanel.height
         property int maxResultHeight: 200
@@ -51,8 +68,8 @@ Window {
         Column {
             id: contentColumn
             width: parent.width
-            spacing: 15
-            padding: 30
+            spacing: 20
+            topPadding: 30
 
             ControlPanel {
                 id: controlPanel
@@ -94,7 +111,7 @@ Window {
                 }
             }
         }
-    }
+     }
 
     Component.onCompleted: {
         root.resultText = "Please ask any question to fetch the answer. Press ESC to quit."

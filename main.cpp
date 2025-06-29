@@ -12,8 +12,6 @@
 #include"GroqAPI.h"
 
 
-
-
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
@@ -44,14 +42,18 @@ int main(int argc, char *argv[])
 // qDebug() << "helllo";
     if (mainRoot) {
         QQuickWindow *mainWindow = qobject_cast<QQuickWindow *>(mainRoot);
-       //  qDebug() << "helllo";
         if (mainWindow) {
-            //qDebug() << "helllo";
+
+
+
+
+
+
             QTimer::singleShot(0, mainWindow, [mainWindow]() {
 #ifdef Q_OS_WIN
                 HWND hwnd = (HWND) mainWindow->winId();
-                BOOL success = SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
-                qDebug() << "Display Affinity result:" << success;
+                //BOOL success = SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
+               // qDebug() << "Display Affinity result:" << success;
                // qDebug() << "helllo";
 #endif
             });
@@ -64,3 +66,4 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
+

@@ -42,16 +42,40 @@ Rectangle {
 
     Connections {
            target: groq
-           onResponseReceived: resultTextItem.text = markdownToHtml(response)
+           onResponseReceived: {
+
+            resultTextItem.text = markdownToHtml(response)
+            root.isLoading = false
        }
+    }
 
     function markdownToHtml(text) {
         let lines = text.split("\n");
         let html = "";
         let inList = false;
+        let inCode = false;
 
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
+
+            // Code block handling
+            if (line.trim().startsWith("```")) {
+                if (!inCode) {
+                    html += "<pre style='background:#2a2a2a; color:#ccc; padding:10px; border-radius:6px; overflow-x:auto; font-family:monospace;'><code>";
+                    inCode = true;
+                } else {
+                    html += "</code></pre>";
+                    inCode = false;
+                }
+                continue;
+            }
+
+            if (inCode) {
+                html += line.replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\n";
+                continue;
+            }
+
+            // Bullet lists
             if (line.match(/^\s*[\*\-]\s+/)) {
                 if (!inList) {
                     html += "<ul style='margin-top: 0px; margin-bottom: 0px; padding-left: 16px;'>";
@@ -68,6 +92,7 @@ Rectangle {
                 html += line
                     .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
                     .replace(/(^|[^\*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<i>$2</i>");
+
                 if (!nextLineIsList) {
                     html += "<br/>";
                 }
@@ -75,9 +100,11 @@ Rectangle {
         }
 
         if (inList) html += "</ul>";
+        if (inCode) html += "</code></pre>"; // auto-close if unbalanced
 
         return html;
     }
+
 
 
 

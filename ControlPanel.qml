@@ -6,16 +6,12 @@ Rectangle {
     id: controlPanel
     width: parent.width -40
     color: "#303030"
-        border.color: "#888"
-        border.width: 2
-        radius:16
-  height: inputField.implicitHeight + 20
+    border.color: "#888"
+    border.width: 2
+    radius:16
+    height: inputField.implicitHeight
     anchors.horizontalCenter: parent.horizontalCenter
     //signal userSubmitted(string inputText)
-    RowLayout {
-        anchors.fill: parent
-        anchors.margins: 0
-        spacing:0
 
 
 
@@ -23,17 +19,17 @@ Rectangle {
         TextEdit {
             id: inputField
             text: ""
+            width: parent.width-24
             wrapMode: TextEdit.Wrap
             readOnly: false
             selectByMouse: true
             focus: true
             color: "white"
-           // placeholderText: "Type here..."  // works in newer Qt or can be custom
             font.pixelSize: 16
-            height: 20  // or dynamically grow
-            padding: 5
+            height: Math.min(200, implicitHeight)
             leftPadding: 12
-            width: parent.width
+            topPadding:12
+
 
             Keys.onPressed: {
                 if (event.key === Qt.Key_Escape) {
@@ -44,6 +40,7 @@ Rectangle {
                         inputField.insert("\n");  // ✅ insert newline
                     } else {
                         console.log("User entered:", inputField.text)
+                        root.isLoading = true
                         groq.sendRequest(inputField.text)
                         inputField.clear()
                         event.accepted = true
@@ -63,13 +60,34 @@ Rectangle {
             id: placeholder
             text: "Type here..."
             color: "#AAAAAA"
-            anchors.verticalCenter: inputField.verticalCenter
-            anchors.left: inputField.left
-            anchors.leftMargin: inputField.leftPadding || 12  // match inputField padding
-            visible: inputField.text.length === 0
             font.pixelSize: inputField.font.pixelSize
+            x: inputField.leftPadding    // align horizontally
+            topPadding: inputField.topPadding
+            visible: inputField.text.length === 0
             z: 2
         }
+
+        BusyIndicator {
+            running: root.isLoading
+            visible: root.isLoading
+            anchors.right: parent.right
+            anchors.rightMargin: 20
+            anchors.verticalCenter: parent.verticalCenter
+            width: 48
+            height: 48
+            z: 2
+
+        }
+
+
+
+
+        Behavior on height {
+            NumberAnimation { duration: 100; easing.type: Easing.OutCubic }
+        }
+
+
+
 
         property int lineCount: Math.ceil(inputField.implicitHeight / inputField.font.pixelSize)
 
@@ -81,7 +99,7 @@ Rectangle {
 
 
 
-    }
+
 
 
 
