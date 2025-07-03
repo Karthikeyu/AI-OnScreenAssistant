@@ -14,7 +14,7 @@ Window {
     y: Screen.height - height- 20         // align window to bottom of screen
     title: "AI Assistant Base"
     flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
-    color: "#00000000"
+    color: "transparent"
     property bool isLoading: false
     onResultTextChanged: {
             Qt.callLater(() => {
@@ -43,7 +43,7 @@ Window {
         id: bottomPanel
         width: parent.width
         height: screenHeight
-        color: "#222222"
+        color: "#99000000"
         radius: 16
 
         border.width: 2

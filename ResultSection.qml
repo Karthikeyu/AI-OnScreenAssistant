@@ -35,7 +35,7 @@ Rectangle {
 
     Keys.onPressed: {
         if (event.key === Qt.Key_Escape) {
-            Qt.quit();
+            shutdown.shutdownApp()
         }
     }
 

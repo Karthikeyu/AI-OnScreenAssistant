@@ -12,6 +12,9 @@ qt_add_executable(appAIOnScreenAssistant
     main.cpp
 )
 
+find_package(Qt6 REQUIRED COMPONENTS Quick Widgets)
+
+
 qt_add_qml_module(appAIOnScreenAssistant
     URI AIOnScreenAssistant
     VERSION 1.0
@@ -22,7 +25,14 @@ qt_add_qml_module(appAIOnScreenAssistant
         SOURCES GroqAPI.h
         SOURCES GroqAPI.cpp
         SOURCES GroqAPI.cpp
+        RESOURCES icons/icon1.png app_icon.rc
 )
+if(WIN32)
+    set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/app_icon.rc")
+    target_sources(appAIOnScreenAssistant PRIVATE ${APP_ICON_RESOURCE_WINDOWS})
+endif()
+
+qt_add_resources(appAIOnScreenAssistant "resources.qrc")
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
@@ -36,7 +46,7 @@ set_target_properties(appAIOnScreenAssistant PROPERTIES
 )
 
 target_link_libraries(appAIOnScreenAssistant
-    PRIVATE Qt6::Quick
+     PRIVATE Qt6::Quick Qt6::Widgets
 )
 
 include(GNUInstallDirs)

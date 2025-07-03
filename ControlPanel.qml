@@ -16,38 +16,41 @@ Rectangle {
 
 
 
-        TextEdit {
-            id: inputField
-            text: ""
-            width: parent.width-24
-            wrapMode: TextEdit.Wrap
-            readOnly: false
-            selectByMouse: true
-            focus: true
-            color: "white"
-            font.pixelSize: 16
-            height: Math.min(200, implicitHeight)
-            leftPadding: 12
-            topPadding:12
+    TextEdit {
+        id: inputField
+        text: ""
+        width: parent.width - 24
+        wrapMode: TextEdit.Wrap
+        readOnly: false
+        selectByMouse: true
+        focus: true
+        color: "white"
+        font.pixelSize: 16
+        height: Math.min(200, implicitHeight)
+        leftPadding: 12
+        topPadding: 12
 
-
-            Keys.onPressed: {
-                if (event.key === Qt.Key_Escape) {
-                    Qt.quit()
+        Keys.onPressed: (event) => {
+            if (event.key === Qt.Key_Escape) {
+                shutdown.shutdownApp()
+                event.accepted = true
+            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                if (event.modifiers & Qt.ShiftModifier) {
+                    // Allow Shift+Enter to insert newline
+                    inputField.insert("\n")
                     event.accepted = true
-                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                    if (event.modifiers & Qt.ShiftModifier) {
-                        inputField.insert("\n");  // ✅ insert newline
-                    } else {
-                        console.log("User entered:", inputField.text)
-                        root.isLoading = true
-                        groq.sendRequest(inputField.text)
-                        inputField.clear()
-                        event.accepted = true
-                    }
+                } else {
+                    // Submit normally
+                    console.log("User entered:", inputField.text)
+                    root.isLoading = true
+                    groq.sendRequest(inputField.text)
+                    inputField.clear()
+                    event.accepted = true
                 }
             }
         }
+    }
+
         MouseArea {
             anchors.fill: parent
             z: 1
