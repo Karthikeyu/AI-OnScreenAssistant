@@ -13,7 +13,8 @@ Window {
    // only take required height
     y: Screen.height - height- 20         // align window to bottom of screen
     title: "AI Assistant Base"
-    flags: Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
+    //flags:  Qt.Window |  Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
+   flags:   Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint
     color: "transparent"
     property bool isLoading: false
     onResultTextChanged: {

@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <shobjidl.h>  // For SetCurrentProcessExplicitAppUserModelID
 #include <QGuiApplication>
 #include <QQuickWindow>
 #include <QQmlApplicationEngine>
@@ -12,10 +13,12 @@
 #include <QMenu>
 #include <QAction>
 #include <QApplication>
+#include <QFile>
 
 #include "GroqAPI.h"
 
 HWND g_hotkeyHwnd = nullptr;
+QSystemTrayIcon* trayIcon = nullptr;  // Global pointer
 
 class ShutdownHelper : public QObject {
     Q_OBJECT
@@ -26,8 +29,6 @@ public slots:
         QCoreApplication::quit();
     }
 };
-
-
 
 void registerHotkeyThread(QPointer<QQuickWindow> mainWnd) {
     std::thread([mainWnd]() {
@@ -46,18 +47,21 @@ void registerHotkeyThread(QPointer<QQuickWindow> mainWnd) {
                 qDebug() << "🔥 Hotkey received in thread";
                 QMetaObject::invokeMethod(QCoreApplication::instance(), [mainWnd]() {
                     if (mainWnd && !mainWnd.isNull()) {
-                        qDebug() << "🎯 Showing window via thread callback";
-                        if(mainWnd->isVisible())
-                        {
+                        if (mainWnd->isVisible()) {
+                            qDebug() << "🙈 Hiding main window...";
                             mainWnd->hide();
-                        }else
-                        {
+                            trayIcon->hide();  // Force refresh
+                            trayIcon->show();
+                            trayIcon->showMessage(
+                                "AI Assistant Running",
+                                "App is minimized to tray. Press Shift+Q to reopen.",
+                                QSystemTrayIcon::Information, 4000);
+                        } else {
+                            qDebug() << "👁️ Showing main window...";
                             mainWnd->show();
                             mainWnd->raise();
                             mainWnd->requestActivate();
-
                         }
-
                     }
                 }, Qt::QueuedConnection);
             }
@@ -68,6 +72,11 @@ void registerHotkeyThread(QPointer<QQuickWindow> mainWnd) {
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     QQuickWindow::setDefaultAlphaBuffer(true);
+
+#ifdef Q_OS_WIN
+    // Important: Set AppUserModelID to make Windows treat the app as stable/known
+    SetCurrentProcessExplicitAppUserModelID(L"com.busa.AIOnScreenAssistant");
+#endif
 
     QQmlApplicationEngine engine;
     GroqApi groq;
@@ -83,31 +92,39 @@ int main(int argc, char *argv[]) {
 #ifdef Q_OS_WIN
     HWND hwnd = reinterpret_cast<HWND>(mainWnd->winId());
     SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE);
+
 #endif
 
-    // Tray icon setup
-    QSystemTrayIcon *trayIcon = new QSystemTrayIcon(QIcon(":/icons/app_icon.png"), &app);
-    trayIcon->setIcon(QIcon(":/icons/app_icon.png"));
-    mainWnd->setIcon(QIcon(":/icons/app_icon.png"));
-    trayIcon->setVisible(true);
+    // --- Tray Icon Setup ---
+    trayIcon = new QSystemTrayIcon(&app);
+    QIcon trayAppIcon = QIcon(":/icons/app_icon.png");
 
-    // Optional: context menu
+    trayIcon->setIcon(trayAppIcon); // Set before show()
+    trayIcon->setToolTip("AI On-Screen Assistant");
+    trayIcon->setVisible(true);     // Call after icon is set
+
+    //app.setWindowIcon(trayAppIcon);
+    //mainWnd->setIcon(trayAppIcon);
+
+    // --- Tray Menu ---
     QMenu *trayMenu = new QMenu();
     QAction *quitAction = trayMenu->addAction("Quit");
     QObject::connect(quitAction, &QAction::triggered, &app, &QCoreApplication::quit);
-
     trayIcon->setContextMenu(trayMenu);
-    trayIcon->setToolTip("AI On-Screen Assistant");
-    trayIcon->show();
-    trayIcon->showMessage("AI Assistant", "Application minimized to tray.");
 
-    // Optional: toggle window on tray icon click
-    QObject::connect(trayIcon, &QSystemTrayIcon::activated, [mainWnd](QSystemTrayIcon::ActivationReason reason) {
-        if (reason == QSystemTrayIcon::Trigger) { // single click
-            if (mainWnd->isVisible())
-                mainWnd->hide();
-            else
-                mainWnd->show();
+    // --- Click to toggle window ---
+    QObject::connect(trayIcon, &QSystemTrayIcon::activated, [mainWnd]() {
+        if (mainWnd->isVisible()) {
+            mainWnd->hide();
+            trayIcon->hide();
+            trayIcon->show();
+            trayIcon->showMessage("AI Assistant Running",
+                                  "App is minimized to tray. Press Shift+Q to reopen.",
+                                  QSystemTrayIcon::Information, 3000);
+        } else {
+            mainWnd->show();
+            mainWnd->raise();
+            mainWnd->requestActivate();
         }
     });
 
@@ -116,14 +133,12 @@ int main(int argc, char *argv[]) {
 
     registerHotkeyThread(mainWnd);  // ✅ Launch background thread
 
-
     QObject::connect(&app, &QCoreApplication::aboutToQuit, []() {
-        UnregisterHotKey(nullptr, 1);
+        UnregisterHotKey(g_hotkeyHwnd, 1);
+        if (trayIcon) trayIcon->hide();
     });
-
 
     return app.exec();
 }
 
 #include "main.moc"
-

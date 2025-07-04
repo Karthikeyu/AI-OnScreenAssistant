@@ -4,41 +4,36 @@ project(AIOnScreenAssistant VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Quick)
+find_package(Qt6 REQUIRED COMPONENTS Quick Widgets)
 
 qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(appAIOnScreenAssistant
     main.cpp
+  #  Resources.qrc        # ✅ add here directly
 )
-
-find_package(Qt6 REQUIRED COMPONENTS Quick Widgets)
-
 
 qt_add_qml_module(appAIOnScreenAssistant
     URI AIOnScreenAssistant
     VERSION 1.0
-    QML_FILES Main.qml
-    QML_FILES OverlayWindow.qml
-        QML_FILES ControlPanel.qml
-        QML_FILES ResultSection.qml
-        SOURCES GroqAPI.h
-        SOURCES GroqAPI.cpp
-        SOURCES GroqAPI.cpp
-        RESOURCES icons/icon1.png app_icon.rc
+    QML_FILES
+        Main.qml
+        OverlayWindow.qml
+        ControlPanel.qml
+        ResultSection.qml
+    SOURCES
+        GroqAPI.h
+        GroqAPI.cpp
+    RESOURCES
+        Resources.qrc
 )
+
 if(WIN32)
     set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/app_icon.rc")
     target_sources(appAIOnScreenAssistant PRIVATE ${APP_ICON_RESOURCE_WINDOWS})
 endif()
 
-qt_add_resources(appAIOnScreenAssistant "resources.qrc")
-
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
 set_target_properties(appAIOnScreenAssistant PROPERTIES
-#    MACOSX_BUNDLE_GUI_IDENTIFIER com.example.appAIOnScreenAssistant
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
@@ -46,12 +41,5 @@ set_target_properties(appAIOnScreenAssistant PROPERTIES
 )
 
 target_link_libraries(appAIOnScreenAssistant
-     PRIVATE Qt6::Quick Qt6::Widgets
-)
-
-include(GNUInstallDirs)
-install(TARGETS appAIOnScreenAssistant
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    PRIVATE Qt6::Quick Qt6::Widgets
 )

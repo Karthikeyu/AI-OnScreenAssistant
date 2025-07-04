@@ -8,7 +8,7 @@ width: Screen.width
 height: Screen.height - 200
 visible: true
 color: "transparent"
-flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint  | Qt.TransparentForInput
+//flags: Qt.Tool | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint  | Qt.TransparentForInput
 
 
 }

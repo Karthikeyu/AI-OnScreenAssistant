@@ -29,8 +29,19 @@ Rectangle {
         font.pixelSize: 16
         textFormat: TextEdit.RichText
         anchors.horizontalCenter: parent.horizontalCenter
-        padding: 20
+        padding: 25
 
+    }
+
+    Text {
+        id: shortcuts
+        text: "<i>Shift + Q to hide/unhide, Esc to exit</i>"
+        z:2
+        font.pixelSize: 12
+        color: "#AAAAAA"
+        anchors.right: parent.right
+        padding:8
+        rightPadding:20
     }
 
     Keys.onPressed: {

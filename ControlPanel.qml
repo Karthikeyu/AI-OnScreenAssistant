@@ -11,9 +11,6 @@ Rectangle {
     radius:16
     height: inputField.implicitHeight
     anchors.horizontalCenter: parent.horizontalCenter
-    //signal userSubmitted(string inputText)
-
-
 
 
     TextEdit {
