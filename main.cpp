@@ -14,7 +14,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QFile>
-
+#include "xorencryption.h"
 #include "GroqAPI.h"
 
 HWND g_hotkeyHwnd = nullptr;
@@ -67,6 +67,17 @@ void registerHotkeyThread(QPointer<QQuickWindow> mainWnd) {
             }
         }
     }).detach();
+}
+
+bool encryptConfigFile(const QString &inputPath, const QString &outputPath, const QByteArray &key)
+{
+    if (XOREncryption::encryptToFile(inputPath, outputPath, key)) {
+        qDebug() << "✅ Encrypted config written to:" << outputPath;
+        return true;
+    } else {
+        qWarning() << "❌ Failed to encrypt config file.";
+        return false;
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -127,6 +138,9 @@ int main(int argc, char *argv[]) {
             mainWnd->requestActivate();
         }
     });
+
+
+    encryptConfigFile(QCoreApplication::applicationDirPath() +"/config.json", QCoreApplication::applicationDirPath() +"/config.enc", "my_secret_xor_key");
 
     ShutdownHelper shutdown;
     engine.rootContext()->setContextProperty("shutdown", &shutdown);

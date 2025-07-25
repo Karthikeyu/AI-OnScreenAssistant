@@ -26,6 +26,7 @@ qt_add_qml_module(appAIOnScreenAssistant
         GroqAPI.cpp
     RESOURCES
         Resources.qrc
+        SOURCES xorencryption.h xorencryption.cpp
 )
 
 if(WIN32)

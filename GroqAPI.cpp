@@ -63,33 +63,31 @@ void GroqApi::handleReply(QNetworkReply *reply) {
     emit responseReceived("⚠️ No usable response received.");
 }
 
+#include "xorencryption.h"
+
 void GroqApi::loadAPIKey()
 {
-    QString configPath = QCoreApplication::applicationDirPath() + "/../../config.json";
-    QFile file(configPath);
+    QString configPath = QCoreApplication::applicationDirPath() + "/config.enc";
+    QByteArray key = "my_secret_xor_key"; // Make sure this matches your encryption tool
 
-    if (!file.exists()) {
-        qWarning() << "❌ Config file not found at:" << configPath;
-        return;
-    }
-
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "❌ Failed to open config file at:" << configPath;
+    QByteArray decryptedData = XOREncryption::decryptFile(configPath, key);
+    if (decryptedData.isEmpty()) {
+        qWarning() << "❌ Decryption failed or file missing.";
         return;
     }
 
     QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &parseError);
+    QJsonDocument doc = QJsonDocument::fromJson(decryptedData, &parseError);
     if (parseError.error != QJsonParseError::NoError) {
-        qWarning() << "❌ Failed to parse config JSON:" << parseError.errorString();
+        qWarning() << "❌ Failed to parse decrypted JSON:" << parseError.errorString();
         return;
     }
 
     apiKey = doc.object().value("groq_api_key").toString();
 
     if (apiKey.isEmpty()) {
-        qWarning() << "⚠️ API key not found or empty in config.json!";
+        qWarning() << "⚠️ API key not found or empty in decrypted config!";
     } else {
-        qDebug() << "✅ API key loaded successfully.";
+        qDebug() << "✅ API key loaded and decrypted successfully.";
     }
 }
