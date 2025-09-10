@@ -10,7 +10,6 @@ qt_standard_project_setup(REQUIRES 6.8)
 
 qt_add_executable(appAIOnScreenAssistant
     main.cpp
-  #  Resources.qrc        # ✅ add here directly
 )
 
 qt_add_qml_module(appAIOnScreenAssistant

@@ -25,7 +25,7 @@ void GroqApi::sendRequest(const QString &prompt) {
     messages.append(message);
 
     QJsonObject payload;
-    payload["model"] = "llama3-70b-8192";
+    payload["model"] = "llama-3.3-70b-versatile";
     payload["messages"] = messages;
 
     QJsonDocument doc(payload);
